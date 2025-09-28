@@ -115,7 +115,6 @@ def listar_reservas():
         print(f"[{r.folio}] Cliente: {r.cliente.nombre}, Sala: {r.sala.nombre}, Fecha: {r.fecha_evento}, Turno: {r.turno}, Evento: {r.nombre_evento}")
     print("================\n")
 
-########### Registramos clientes (nombres y apellidos) ###########
 def registrar_cliente_interactivo():
      global contador_clientes
      nombre = input("Nombre del cliente: ").strip()
@@ -128,7 +127,6 @@ def registrar_cliente_interactivo():
      print(f"Cliente registrado con éxito. ID: {cliente.id_cliente}")
      contador_clientes += 1
 
-  #Listamos a los clientes ordenandolos por apellido,nombre
 def listar_clientes():
     print("\n=== Clientes Registrados ===")
     if not clientes:
@@ -139,8 +137,6 @@ def listar_clientes():
         print(f"ID: {c.id_cliente} - {c.apellidos}, {c.nombre}")
     print("=============================\n")
 
-
-########### Registro interactivo de salas ###########
 def registrar_sala_interactivo():
     global contador_salas
     nombre = input("Ingrese el nombre de la sala: ").strip()
@@ -154,8 +150,6 @@ def registrar_sala_interactivo():
     print(f"Sala registrada con éxito. ID: {sala.id_sala}")
     contador_salas += 1
 
-
-########### Hacer reserva (interactivo y con validaciones) ###########
 def hacer_reserva_interactivo():
     while True:
         listar_clientes()
@@ -183,8 +177,6 @@ def hacer_reserva_interactivo():
         print("La reserva debe hacerse con al menos 2 días de anticipación.")
         return
 
-
-    # Mostrar salas disponibles
     salas_disponibles = []
     for sala in salas:
         for turno in ["mañana", "tarde", "noche"]:
@@ -217,8 +209,6 @@ def hacer_reserva_interactivo():
     reservas.append(reserva)
     print(f"Su reserva se ah realizada con éxito. Folio: {folio}")
 
-
-########### Consultar reservas por su fecha ###########
 def consultar_reservas_por_fecha():
     fecha_str = input("Ingrese la fecha a consultar (YYYY-MM-DD): ")
     try:
@@ -250,8 +240,6 @@ def consultar_reservas_por_fecha():
 
     print("*******************************************\n")
 
-
-########### Editar el nombre del evento ###########
 def editar_nombre_evento():
     fecha_inicio = input("Fecha de inicio (YYYY-MM-DD): ")
     fecha_fin = input("Fecha de fin (YYYY-MM-DD): ")
