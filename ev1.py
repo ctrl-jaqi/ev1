@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from tabulate import tabulate 
+from tabulate import tabulate
 
 ########### Datos en memoria ###########
 
@@ -12,13 +12,13 @@ contador_clientes = 1
 contador_salas = 1
 contador_reservas = 1
 
-
 ########### Clases ###########
 
 class Cliente:
-    def _init_(self, id_cliente, nombre):
+    def _init_(self, id_cliente, nombre, apellidos=None):
         self.id_cliente = id_cliente
         self.nombre = nombre
+        self.apellidos = apellidos
 
 class Sala:
     def _init_(self, id_sala, nombre, capacidad):
@@ -36,14 +36,13 @@ class Reserva:
         self.nombre_evento = nombre_evento
         self.fecha_reserva = datetime.now().date()
 
-
 ########### Funciones ###########
 
-def registrar_cliente(nombre):
+def registrar_cliente(nombre, apellidos=None):
     global contador_clientes
-    cliente = Cliente(contador_clientes, nombre)
+    cliente = Cliente(contador_clientes, nombre, apellidos)
     clientes.append(cliente)
-    print(f"Cliente registrado: {cliente.nombre} (ID: {cliente.id_cliente})")
+    print(f"Cliente registrado: {cliente.nombre} {apellidos or ''} (ID: {cliente.id_cliente})")
     contador_clientes += 1
     return cliente
 
@@ -116,39 +115,31 @@ def listar_reservas():
     print("================\n")
 
 def registrar_cliente_interactivo():
-     global contador_clientes
-     nombre = input("Nombre del cliente: ").strip()
-     apellidos = input("Apellidos del cliente: ").strip()
-     if not nombre or not apellidos:
+    nombre = input("Nombre del cliente: ").strip()
+    apellidos = input("Apellidos del cliente: ").strip()
+    if not nombre or not apellidos:
         print("Nombre y apellidos no pueden estar vacíos.")
         return
-     cliente = Cliente(contador_clientes, nombre, apellidos)
-     clientes.append(cliente)
-     print(f"Cliente registrado con éxito. ID: {cliente.id_cliente}")
-     contador_clientes += 1
+    registrar_cliente(nombre, apellidos)
 
 def listar_clientes():
     print("\n=== Clientes Registrados ===")
     if not clientes:
         print("No hay clientes registrados.")
         return
-    clientes_ordenados = sorted(clientes, key=lambda c: (c.apellidos.lower(), c.nombre.lower()))
+    clientes_ordenados = sorted(clientes, key=lambda c: ((c.apellidos or "").lower(), c.nombre.lower()))
     for c in clientes_ordenados:
-        print(f"ID: {c.id_cliente} - {c.apellidos}, {c.nombre}")
+        print(f"ID: {c.id_cliente} - {(c.apellidos or '')}, {c.nombre}")
     print("=============================\n")
 
 def registrar_sala_interactivo():
-    global contador_salas
     nombre = input("Ingrese el nombre de la sala: ").strip()
     try:
         capacidad = int(input("Ingrese la capacidad de la sala: "))
     except ValueError:
         print("Capacidad debe ser un número.")
         return
-    sala = Sala(contador_salas, nombre, capacidad)
-    salas.append(sala)
-    print(f"Sala registrada con éxito. ID: {sala.id_sala}")
-    contador_salas += 1
+    registrar_sala(nombre, capacidad)
 
 def hacer_reserva_interactivo():
     while True:
@@ -184,7 +175,7 @@ def hacer_reserva_interactivo():
                 salas_disponibles.append((sala, turno))
 
     if not salas_disponibles:
-        print("Lo sentimos no hay salas disponibles para esa fecha.")
+        print("Lo sentimos, no hay salas disponibles para esa fecha.")
         return
 
     print("\n=== Salas disponibles ===")
@@ -207,7 +198,7 @@ def hacer_reserva_interactivo():
     folio = generar_folio()
     reserva = Reserva(folio, cliente, sala, fecha_evento, turno, nombre_evento)
     reservas.append(reserva)
-    print(f"Su reserva se ah realizada con éxito. Folio: {folio}")
+    print(f"Su reserva se ha realizado con éxito. Folio: {folio}")
 
 def consultar_reservas_por_fecha():
     fecha_str = input("Ingrese la fecha a consultar (YYYY-MM-DD): ")
@@ -216,29 +207,29 @@ def consultar_reservas_por_fecha():
     except ValueError:
         print("Fecha inválida.")
         return
-    
-    reservas_en_fecha=[r for r in reservas if r.fecha_evento == fecha]
+
+    reservas_en_fecha = [r for r in reservas if r.fecha_evento == fecha]
 
     if not reservas_en_fecha:
         print("Lo sentimos, no hay reservas para esta fecha.")
+        return
 
     print(f"\n=== Reporte de reservas para {fecha} ===")
-
     tabla = []
     for r in reservas_en_fecha:
+        nombre_cliente = f"{r.cliente.nombre} {getattr(r.cliente, 'apellidos', '')}".strip()
         tabla.append([
             r.folio,
-            f"{r.cliente.nombre} {r.cliente.apellidos}",
+            nombre_cliente,
             r.sala.nombre,
             r.turno,
             r.nombre_evento,
             r.fecha_reserva.strftime("%Y-%m-%d")
         ])
-    
+
     headers = ["Folio", "Cliente", "Sala", "Turno", "Evento", "Fecha Reserva"]
     print(tabulate(tabla, headers=headers, tablefmt="grid"))
-
-    print("*******************************************\n")
+    print("*****\n")
 
 def editar_nombre_evento():
     fecha_inicio = input("Fecha de inicio (YYYY-MM-DD): ")
@@ -277,6 +268,7 @@ def editar_nombre_evento():
             print("Folio no encontrado en el rango.")
 
 ########### Menú principal ###########
+
 def menu():
     while True:
         print("\n===== Menú Principal =====")
@@ -286,7 +278,7 @@ def menu():
         print("4. Registrar un nuevo cliente")
         print("5. Registrar una nueva sala")
         print("6. Salir")
-        opcion = input("Porfavor seleccione una opción: ")
+        opcion = input("Por favor seleccione una opción: ")
 
         if opcion == "1":
             hacer_reserva_interactivo()
